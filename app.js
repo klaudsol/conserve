@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import "@babel/polyfill";
 import "cross-fetch/polyfill";
 import Koa from 'koa';
@@ -7,8 +8,8 @@ const app = new Koa();
 
 // response
 app.use(async ctx => {
-  console.log("Here!");
-  const slackUrl = "https://hooks.slack.com/services/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";
+  const slackUrl = process.env.SLACK_URL;
+  console.log(`SLACKURL: ${slackUrl}`);
   /*global fetch*/
   const resp = await fetch(slackUrl, {
     method: "POST",
