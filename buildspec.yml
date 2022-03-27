@@ -1,9 +1,15 @@
 version: 0.2
 phases:
-  install:
-    commands: yarn install
-artifacts:
-  files:
-    - '**/*'
-  name: function.zip
+  pre_build:
+    commands:
+      - echo "Get current timestamp for reports naming.."
+      - TIME=$(date +"%Y%m%d_%H%M%S")
+  build:
+    commands: 
+      - echo "yarn install"
+      - yarn install
+  post_build:
+    commands:
+      - zip -r function-${TIME}.zip .
+      - aws lambda update-function-code --function-name Conserve --zip-file fileb://function-${TIME}.zip
     
