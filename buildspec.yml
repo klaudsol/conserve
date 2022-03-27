@@ -5,3 +5,5 @@ phases:
 artifacts:
   files:
     - '**/*'
+  name: function.zip
+    
