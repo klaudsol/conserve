@@ -9,6 +9,8 @@ const app = new Koa();
 
 // response
 app.use(async ctx => {
+  const instances = JSON.parse(process.env.INSTANCES || "{}");
+  console.log(instances);
   const ec2 = new EC2({region: 'us-east-1', maxRetries: 15});
    var params = {
     InstanceIds: [
