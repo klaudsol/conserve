@@ -7,6 +7,7 @@ const app = new Koa();
 
 // response
 app.use(async ctx => {
+  console.log("Here!");
   const slackUrl = "https://hooks.slack.com/services/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";
   /*global fetch*/
   const resp = await fetch(slackUrl, {
