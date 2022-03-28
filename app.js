@@ -31,7 +31,7 @@ app.use(async ctx => {
     const result = await ec2.stopInstances({InstanceIds: [instance.id]});
     console.log(result);
   });
-  Promise.all(instances);
+  await Promise.all(instances);
   
   ctx.body = {message: 'OK'};
 });
