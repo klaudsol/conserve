@@ -25,13 +25,13 @@ const slackMessage = (message) => {
 app.use(async ctx => {
   const instances = JSON.parse(process.env.INSTANCES || "[]");
   
-  instances.map(async (instance) => {
+  const promises = instances.map(async (instance) => {
     slackMessage(`Shutting down ${instance.id} in ${instance.region}...`);
     const ec2 = new EC2({region: instance.region, maxRetries: 15});
     const result = await ec2.stopInstances({InstanceIds: [instance.id]});
     console.log(result);
   });
-  await Promise.all(instances);
+  await Promise.all(promises);
   
   ctx.body = {message: 'OK'};
 });
