@@ -8,38 +8,32 @@ import { EC2 } from '@aws-sdk/client-ec2';
 const app = new Koa();
 
 // response
-app.use(async ctx => {
-  const instances = JSON.parse(process.env.INSTANCES || "{}");
-  console.log(instances);
-  const ec2 = new EC2({region: 'us-east-1', maxRetries: 15});
-   var params = {
-    InstanceIds: [
-       "i-055e44a095b21d5bf"
-    ]
-   };
-  const result = await ec2.describeInstances(params);
-  /*
-   ec2.describeInstances(params, function(err, data) {
-     if (err) console.log(err, err.stack); // an error occurred
-     else     console.log(data);           // successful response
-     /*
-     data = {
-     }
-   });
-     */
-  console.log(result.Reservations.map(x => x.Instances[0].State.Name));
+
+
+const slackMessage = (message) => {
   const slackUrl = process.env.SLACK_URL;
-  console.log(`SLACKURL: ${slackUrl}`);
   /*global fetch*/
-  const resp = await fetch(slackUrl, {
+  fetch(slackUrl, {
     method: "POST",
     headers: {
         'Content-type': 'application/json'
     },
-    body: JSON.stringify({"text":`Shutting down Windows machine... ${(new Date()).toISOString()}`})
+    body: JSON.stringify({"text": message})
   });
-  console.log(await resp.text());
-  ctx.body = {message: 'Hello Koa'};
+}; 
+
+app.use(async ctx => {
+  const instances = JSON.parse(process.env.INSTANCES || "[]");
+  
+  instances.map(async (instance) => {
+    slackMessage(`Shutting down ${instance.id} in ${instance.region}...`);
+    const ec2 = new EC2({region: instance.region, maxRetries: 15});
+    const result = await ec2.stopInstances({InstanceIds: [instance.id]});
+    console.log(result);
+  });
+  Promise.all(instances);
+  
+  ctx.body = {message: 'OK'};
 });
 
 app.listen(8080);
